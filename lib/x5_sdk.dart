@@ -39,7 +39,7 @@ class X5Sdk {
   }
 
   ///设置是否在非wifi环境下载内核，默认false
-  static Future<bool> setDownloadWithoutWifi(bool isDownloadWithoutWifi) async {
+  static Future<bool> setDownloadWithoutWifi(bool? isDownloadWithoutWifi) async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final Map<String, dynamic> params = <String, dynamic>{
         'isDownloadWithoutWifi': isDownloadWithoutWifi ?? false,
@@ -53,7 +53,7 @@ class X5Sdk {
   }
 
   ///screenMode 播放参数，103横屏全屏，104竖屏全屏。默认102
-  static Future<void> openVideo(String url, {int screenMode}) async {
+  static Future<void> openVideo(String url, {int? screenMode}) async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final Map<String, dynamic> params = <String, dynamic>{
         'screenMode': screenMode ?? 102,
@@ -108,17 +108,17 @@ class X5Sdk {
       menuItems 是 json 数组，表示菜单中的每一项。
    */
   static Future<String> openFile(String filePath,
-      {String local,
-      String style,
-      String topBarBgColor,
-      String menuData}) async {
+      {String? local,
+      String? style,
+      String? topBarBgColor,
+      String? menuData}) async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final Map<String, String> params = <String, String>{
         'filePath': filePath,
-        'local': local,
-        'style': style,
-        'topBarBgColor': topBarBgColor,
-        'menuData': menuData
+        'local': local??"",
+        'style': style??"",
+        'topBarBgColor': topBarBgColor??"",
+        'menuData': menuData??""
       };
       return await _channel.invokeMethod("openFile", params);
     } else {
@@ -128,9 +128,9 @@ class X5Sdk {
 
   ///打开简单的x5webview
   static Future<void> openWebActivity(String url,
-      {String title,
-      Map<String, String> headers,
-      InterceptUrlCallBack callback}) async {
+      {String? title,
+      Map<String, String>? headers,
+      InterceptUrlCallBack? callback}) async {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final Map<String, dynamic> params = <String, dynamic>{
         'title': title,
@@ -149,7 +149,7 @@ class X5Sdk {
           } catch (e) {
             print(e);
           }
-          return;
+          return  Future.value(null);
         });
       }
 
@@ -161,7 +161,7 @@ class X5Sdk {
 
   ///设置内核下载安装事件
   static Future<void> setX5SdkListener(X5SdkListener listener) async {
-    _channel.setMethodCallHandler((call) {
+      _channel.setMethodCallHandler((call) {
       switch (call.method) {
         case "onInstallFinish":
           listener.onInstallFinish();
@@ -175,9 +175,8 @@ class X5Sdk {
         default:
           throw MissingPluginException(
               '${call.method} was invoked but has no handler');
-          break;
       }
-      return;
+      return Future.value(null);
     });
   }
 }
@@ -200,7 +199,7 @@ class X5SdkListener {
   DownloadProgress onDownloadProgress;
 
   X5SdkListener(
-      {@required this.onInstallFinish,
-      @required this.onDownloadFinish,
-      @required this.onDownloadProgress});
+      {required this.onInstallFinish,
+      required this.onDownloadFinish,
+      required this.onDownloadProgress});
 }
